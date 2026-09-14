@@ -1,44 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { EllipsisHorizontalIcon, WrenchScrewdriverIcon, HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
-import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
-import { parts, bodies, modifications } from "@/lib/data";
+import { EllipsisHorizontalIcon, WrenchScrewdriverIcon, ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
+import { parts } from "@/lib/data";
 import { useApp } from "@/lib/state";
-import { api, type FeedItem } from "@/lib/api";
 import { Screen, AppHeader, FadeIn } from "@/components/garage/screen";
 import { FitBadge, fitmentText } from "@/components/garage/fit-badge";
-import { CountPill } from "@/components/garage/count-pill";
-import { AuthorRow } from "@/components/garage/author-row";
 import { IconButton } from "@/components/garage/icon-button";
-import { ListHeader } from "@/components/garage/list-header";
 import { Money } from "@/components/garage/money";
 import { ListSkeleton } from "@/components/garage/skeletons";
+import { ReactionRow, ReactionStat } from "@/components/garage/reaction-row";
+import { ReviewsThread, useReviews } from "@/components/garage/reviews-thread";
 import { buttonVariants } from "@/components/ui/button";
 import { plural } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-const carOf = (r: FeedItem) => {
-  const b = bodies.find((x) => x.code === r.body_code)?.name ?? "Гранта";
-  const m = modifications.find((x) => x.id === r.modification)?.name ?? "";
-  return `${b}${m ? `, ${m}` : ""}`;
-};
-
-// Экран 5: деталь на модификации. Обложка как медиа карточки работы, ниже — секции белыми
-// карточками, отзывы — строками автора, как в их комментариях.
+// Экран 5: деталь на модификации — как открытая работа у референса: медиа-обложка,
+// ряд реакций справа, ниже тред отзывов с композером.
 export default function PartView({ slug }: { slug: string }) {
-  const { state, loading, toggleRespect } = useApp();
-  const [data, setData] = useState<{ installed: number; reworked: number; reviews: FeedItem[] } | null>(null);
-
-  useEffect(() => {
-    if (!state) return;
-    void api.part(slug).then(setData);
-  }, [slug, state]);
+  const { state, loading } = useApp();
+  const { data, reload } = useReviews(state ? slug : null);
 
   const part = parts.find((p) => p.slug === slug);
   const fit = state?.car.modification && part ? part.fitment[state.car.modification] : "unknown";
   const inGarage = !!part && (state?.garage ?? []).some((g) => g.part_slug === part.slug);
+  const reviewCount = (data?.reviews ?? []).filter((r) => r.review_text).length;
 
   return (
     <Screen
@@ -55,20 +41,13 @@ export default function PartView({ slug }: { slug: string }) {
       ) : loading ? (
         <ListSkeleton count={1} kind="card" />
       ) : (
-        <div className="flex flex-col gap-4">
-          {/* Обложка */}
+        <div className="flex flex-col gap-2">
+          {/* Обложка — медиа работы */}
           <FadeIn>
             <div className="relative overflow-hidden rounded-[14px] bg-surface p-4">
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(120%_80%_at_50%_0%,hsl(240_8%_97%),transparent)]" />
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(120%_80%_at_50%_0%,var(--surface-muted),transparent)]" />
               <div className="relative">
-                <div className="flex items-start justify-between gap-3">
-                  <FitBadge fitment={fit} size="sm" />
-                  {data ? (
-                    <CountPill icon={WrenchScrewdriverIcon} count={data.installed} label="Сколько раз ставили" locked />
-                  ) : (
-                    <span className="shimmer h-8 w-[54px] rounded-[76px]" />
-                  )}
-                </div>
+                <FitBadge fitment={fit} size="sm" />
                 <div className="pt-6 text-[22px] font-bold leading-[1.15] tracking-tight text-text-primary text-balance">
                   {part.name}
                 </div>
@@ -84,8 +63,16 @@ export default function PartView({ slug }: { slug: string }) {
             </div>
           </FadeIn>
 
-          {/* Счёт — главный сигнал */}
+          {/* Ряд реакций — как под работой у референса */}
           <FadeIn index={1}>
+            <ReactionRow>
+              <ReactionStat count={data?.installed ?? 0} icon={WrenchScrewdriverIcon} label="Сколько раз ставили" />
+              <ReactionStat count={reviewCount} icon={ChatBubbleOvalLeftEllipsisIcon} label="Отзывы" />
+            </ReactionRow>
+          </FadeIn>
+
+          {/* Счёт и вердикт */}
+          <FadeIn index={2}>
             <div className="rounded-[14px] bg-surface p-4">
               {data ? (
                 <>
@@ -117,8 +104,7 @@ export default function PartView({ slug }: { slug: string }) {
             </div>
           </FadeIn>
 
-          {/* Что ещё купить */}
-          <FadeIn index={2}>
+          <FadeIn index={3}>
             <div className="rounded-[14px] bg-surface p-4">
               <h3 className="text-sm font-semibold text-text-primary">Что ещё придётся купить</h3>
               {part.alsoNeeded.length === 0 ? (
@@ -139,78 +125,29 @@ export default function PartView({ slug }: { slug: string }) {
                   {part.difficulty} · {part.time}
                 </span>
               </div>
+              <div className="mt-2 flex items-center justify-between text-sm">
+                <span className="text-text-secondary">Где купить</span>
+                <span className="font-medium">
+                  {part.shop} · <span className="font-mono">{part.article}</span>
+                </span>
+              </div>
             </div>
-          </FadeIn>
-
-          {/* Отзывы — строки автора, как комментарии */}
-          <FadeIn index={3}>
-            <ListHeader title="Кто ещё ставил на такую же" />
-            {data === null ? (
-              <ListSkeleton count={2} kind="row" />
-            ) : data.reviews.length === 0 ? (
-              <div className="rounded-[14px] bg-surface p-4 text-sm text-text-secondary">
-                Отзывов пока нет. Поставьте первым — и расскажите, как встало: это увидят те, кто выбирает то же самое.
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {data.reviews.map((r, i) => {
-                  const target = `install:${r.id}`;
-                  const active = state?.respects.includes(target);
-                  return (
-                    <FadeIn key={r.id} index={i}>
-                      <article className="rounded-[14px] bg-surface p-3">
-                        <div className="flex items-center justify-between gap-2">
-                          <AuthorRow name={r.first_name ?? r.username ?? "Владелец"} meta={carOf(r)} />
-                          <CountPill
-                            icon={active ? HeartSolid : HeartOutline}
-                            count={r.respects + (active ? 1 : 0)}
-                            label="Респект"
-                            tone="respect"
-                            active={active}
-                            onClick={() => toggleRespect(target)}
-                          />
-                        </div>
-                        <p className="pt-2 text-sm leading-relaxed text-text-primary">
-                          <span className={cn("font-medium", r.reworked ? "text-fit-rework" : "text-fit-ok")}>
-                            {r.reworked ? "Пришлось дорабатывать." : "Встало без доработок."}
-                          </span>{" "}
-                          {r.review_text ?? "Отзыв ещё не написан."}
-                        </p>
-                        <p className="pt-1.5 text-xs text-text-secondary">
-                          <Money value={r.price} />
-                          {r.work_price > 0 ? (
-                            <>
-                              {" + работа "}
-                              <Money value={r.work_price} />
-                            </>
-                          ) : (
-                            " · ставил сам"
-                          )}
-                        </p>
-                      </article>
-                    </FadeIn>
-                  );
-                })}
-              </div>
-            )}
           </FadeIn>
 
           <FadeIn index={4}>
-            <div className="rounded-[14px] bg-surface p-4">
-              <h3 className="text-sm font-semibold text-text-primary">Где купить</h3>
-              <p className="pt-1.5 text-sm text-text-secondary">
-                {part.shop} · артикул <span className="font-mono">{part.article}</span>
-              </p>
-            </div>
-          </FadeIn>
-
-          <FadeIn index={5}>
             <Link
               href={inGarage ? "/profile" : `/part/${part.slug}/add`}
-              className={buttonVariants({ size: "xl", variant: inGarage ? "secondary" : "default", className: "w-full" })}
+              className={buttonVariants({ size: "xl", variant: inGarage ? "secondary" : "default", className: "mt-2 w-full" })}
             >
               {inGarage ? "Уже в гараже — открыть" : "Поставил себе — добавить в гараж"}
             </Link>
+          </FadeIn>
+
+          {/* Тред отзывов — комментарии работы */}
+          <FadeIn index={5} className="pt-4">
+            <div className="border-t border-border pt-3">
+              <ReviewsThread slug={part.slug} data={data} onPosted={reload} />
+            </div>
           </FadeIn>
         </div>
       )}

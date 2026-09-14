@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { EllipsisHorizontalIcon, HeartIcon as HeartSolid, WrenchScrewdriverIcon } from "@heroicons/react/24/solid";
+import { EllipsisHorizontalIcon, HeartIcon as HeartSolid, WrenchScrewdriverIcon, ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
 import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
 import { cn } from "@/lib/utils";
 import type { Fitment } from "@/lib/data";
@@ -30,6 +30,8 @@ export function InstallCard({
   respectActive,
   respectLocked,
   onRespect,
+  reviewCount,
+  onComments,
   note,
   className,
 }: {
@@ -47,6 +49,8 @@ export function InstallCard({
   respectActive?: boolean;
   respectLocked?: boolean;
   onRespect?: () => void;
+  reviewCount?: number;
+  onComments?: () => void;
   note?: string | null;
   className?: string;
 }) {
@@ -94,6 +98,9 @@ export function InstallCard({
         <div className="flex items-center gap-2">
           {installedCount !== undefined && (
             <CountPill icon={WrenchScrewdriverIcon} count={installedCount} label="Сколько раз ставили" locked />
+          )}
+          {reviewCount !== undefined && (
+            <CountPill icon={ChatBubbleOvalLeftEllipsisIcon} count={reviewCount} label="Показать отзывы" onClick={onComments} locked={!onComments} />
           )}
           <CountPill
             icon={respectActive ? HeartSolid : HeartOutline}

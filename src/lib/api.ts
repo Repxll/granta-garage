@@ -43,11 +43,14 @@ export type AppState = {
 
 export type FeedItem = {
   id: number;
+  user_id?: number;
   part_slug: string;
   price: number;
   work_price: number;
   reworked: boolean;
   review_text: string | null;
+  review_at?: string | null;
+  review_count?: number;
   created_at: string;
   first_name: string | null;
   username: string | null;

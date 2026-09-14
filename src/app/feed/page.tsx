@@ -12,6 +12,7 @@ import { InstallCard } from "@/components/garage/install-card";
 import { EmptyState } from "@/components/garage/empty-state";
 import { ListSkeleton } from "@/components/garage/skeletons";
 import { IconButton } from "@/components/garage/icon-button";
+import { ReviewsSheet } from "@/components/garage/reviews-thread";
 import { Button } from "@/components/ui/button";
 import { parts } from "@/lib/data";
 
@@ -34,6 +35,7 @@ export default function FeedPage() {
   const { state, loading, error, reload, toggleRespect } = useApp();
   const [scope, setScope] = useState<"mine" | "all">("mine");
   const [items, setItems] = useState<FeedItem[] | null>(null);
+  const [sheetSlug, setSheetSlug] = useState<string | null>(null);
 
   useEffect(() => {
     if (!state) return;
@@ -103,6 +105,8 @@ export default function FeedPage() {
                         respects={f.respects}
                         respectActive={state?.respects.includes(target)}
                         onRespect={() => toggleRespect(target)}
+                        reviewCount={f.review_count ?? 0}
+                        onComments={() => setSheetSlug(f.part_slug)}
                         note={f.review_text}
                       />
                     </FadeIn>
@@ -113,6 +117,7 @@ export default function FeedPage() {
           </div>
         </>
       )}
+      <ReviewsSheet slug={sheetSlug} open={sheetSlug !== null} onOpenChange={(o) => !o && setSheetSlug(null)} />
     </Screen>
   );
 }

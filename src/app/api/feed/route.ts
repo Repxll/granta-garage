@@ -20,9 +20,10 @@ export async function GET(req: Request) {
   const params = scope === "mine" && me?.body_code ? [user.id, me.body_code] : [user.id];
 
   const rows = await q(
-    `select i.id, i.part_slug, i.price, i.work_price, i.reworked, i.review_text, i.created_at,
+    `select i.id, i.part_slug, i.price, i.work_price, i.reworked, i.review_text, i.review_at, i.created_at,
             u.first_name, u.username, u.body_code, u.modification,
-            (select count(*)::int from respects r where r.target = 'install:' || i.id::text) as respects
+            (select count(*)::int from respects r where r.target = 'install:' || i.id::text) as respects,
+            (select count(*)::int from installs x where x.part_slug = i.part_slug and x.review_text is not null) as review_count
      from installs i join users u on u.id = i.user_id
      ${where}
      order by i.created_at desc

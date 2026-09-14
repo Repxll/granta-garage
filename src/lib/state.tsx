@@ -44,8 +44,13 @@ export function StateProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    tg()?.ready?.();
-    tg()?.expand?.();
+    const t = tg();
+    t?.ready?.();
+    t?.expand?.();
+    // Тема — как в мессенджере у пользователя (и ?theme=dark для проверки в браузере)
+    const q = new URLSearchParams(window.location.search).get("theme");
+    const dark = q ? q === "dark" : t?.colorScheme === "dark";
+    document.documentElement.classList.toggle("dark", dark);
     void reload();
   }, [reload]);
 

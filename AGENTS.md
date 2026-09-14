@@ -57,7 +57,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 `Chip` (h-8 pill, control-surface) · `CountPill` (h-8 min-w-54 радиус 76 — реакции) ·
 `VoteControl` (h-10 min-w-136 — большой счётчик профиля) · `InstallCard` (карточка работы:
 медиа 4/3 + оверлеи + футер с автором и пилюлями) · `PartRow` · `AuthorRow` · `Avatar` ·
-`ListHeader` · `FitBadge` · `Segmented` · `Sheet` (vaul) · `EmptyState` · скелетоны `shimmer`.
+`ListHeader` · `FitBadge` · `Segmented` · `Sheet` (vaul, граббер, без шапки если нет title) ·
+`EmptyState` · скелетоны `shimmer` · **тред отзывов** (`comments.tsx`: `CommentsHeader` с
+квадратным бейджем, `CommentItem` — аватар 40 / имя 16·600 / серый пузырь 14px / пилюля-лайк /
+дата 14; `CommentComposer` — поле радиусом 20, смайлик, круглая кнопка 48) · `ReactionRow` +
+`ReactionStat` (число 18·700 + иконка 20, справа под медиа) · `ReviewsThread` / `ReviewsSheet`.
+
+Тема следует `Telegram.WebApp.colorScheme` (класс `.dark` на html); в браузере — `?theme=dark`.
+Отзывы = комментарии референса, но писать может только тот, кто деталь поставил.
 
 ## Кнопки-ссылки
 

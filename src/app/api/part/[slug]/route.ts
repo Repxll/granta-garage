@@ -20,14 +20,14 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
   );
 
   const reviews = await q(
-    `select i.id, i.price, i.work_price, i.reworked, i.review_text, i.created_at,
+    `select i.id, i.user_id, i.part_slug, i.price, i.work_price, i.reworked, i.review_text, i.review_at, i.created_at,
             u.first_name, u.username, u.body_code, u.modification,
             (select count(*)::int from respects r where r.target = 'install:' || i.id::text) as respects
      from installs i join users u on u.id = i.user_id
-     where i.part_slug = $1 and i.user_id <> $2
-     order by (i.review_text is not null) desc, i.created_at desc
+     where i.part_slug = $1
+     order by (i.review_text is not null) desc, coalesce(i.review_at, i.created_at) desc
      limit 20`,
-    [slug, user.id],
+    [slug],
   );
 
   return Response.json({
