@@ -6,6 +6,15 @@ Telegram Mini App: подбор тюнинг-деталей под конкре�
 Документы проекта лежат уровнем выше:
 [бриф](../GRANTA_TUNING_PRODUCT_BRIEF.md) · [ресерч](../GRANTA_TUNING_RESEARCH.md) · [LATER](LATER.md)
 
+## Живая версия
+
+Mini App: https://granta-garage-psi.vercel.app
+Бот: [@AutoCustsTestBot](https://t.me/AutoCustsTestBot) — кнопка «Открыть гараж» в чате.
+
+**Деплой — это `git push origin main`.** Репозиторий подключён к Vercel: продакшен собирается
+из GitHub за ~20 секунд после пуша. Ручной `vercel deploy --prod` не нужен — с этой машины он
+периодически падает с `fetch failed`, хотя сам Vercel в порядке.
+
 ## Архитектура
 
 Next.js: экраны и API-роуты в одном проекте. Хостинг — Vercel (статический экспорт снят,
