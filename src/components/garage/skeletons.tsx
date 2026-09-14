@@ -1,38 +1,36 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
-// Загрузка — скелетоном в форме будущего контента, а не спиннером поверх экрана:
-// человек видит, что именно грузится, и не гадает.
-export function PartCardSkeleton() {
-  return (
-    <div className="rounded-lg border border-border bg-card p-3">
-      <Skeleton className="h-4 w-3/4" />
-      <Skeleton className="mt-2 h-3 w-1/2" />
-      <Skeleton className="mt-3 h-4 w-2/5" />
-      <Skeleton className="mt-3 h-3 w-3/5" />
-    </div>
-  );
+// Скелетоны в форме будущего контента, с бегущим бликом — как у референса.
+export function Bone({ className }: { className?: string }) {
+  return <div className={cn("shimmer rounded-[14px]", className)} aria-hidden />;
 }
 
-export function FeedCardSkeleton() {
+export function InstallCardSkeleton() {
   return (
-    <div className="rounded-lg border border-border bg-card p-3">
-      <div className="flex justify-between gap-2">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-3 w-16" />
+    <div className="space-y-2">
+      <Bone className="aspect-[4/3] w-full" />
+      <div className="flex h-8 items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Bone className="size-8 rounded-full" />
+          <div className="space-y-1">
+            <Bone className="h-3.5 w-28 rounded-[76px]" />
+            <Bone className="h-3 w-20 rounded-[76px]" />
+          </div>
+        </div>
+        <Bone className="h-8 w-[60px] rounded-[76px]" />
       </div>
-      <Skeleton className="mt-2 h-3 w-28" />
-      <Skeleton className="mt-3 h-4 w-full" />
-      <Skeleton className="mt-2 h-3 w-4/5" />
-      <Skeleton className="mt-3 h-5 w-24" />
-      <Skeleton className="mt-3 h-9 w-28 rounded-md" />
     </div>
   );
 }
 
-export function ListSkeleton({ count = 3, kind = "feed" }: { count?: number; kind?: "feed" | "part" }) {
-  const Item = kind === "feed" ? FeedCardSkeleton : PartCardSkeleton;
+export function RowSkeleton() {
+  return <Bone className="h-[76px] w-full" />;
+}
+
+export function ListSkeleton({ count = 3, kind = "card" }: { count?: number; kind?: "card" | "row" }) {
+  const Item = kind === "card" ? InstallCardSkeleton : RowSkeleton;
   return (
-    <div className="flex flex-col gap-2">
+    <div className={cn("flex flex-col", kind === "card" ? "gap-6" : "gap-2")}>
       {Array.from({ length: count }).map((_, i) => (
         <Item key={i} />
       ))}

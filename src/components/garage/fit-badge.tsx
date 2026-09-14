@@ -1,16 +1,15 @@
 import { cn } from "@/lib/utils";
 import type { Fitment } from "@/lib/data";
 
-// Вердикт о посадке. Три состояния равноправны: «не подтверждено» не маскируется
-// под «подходит» — на этом у конкурентов люди теряют деньги.
-const map: Record<Fitment, { label: string; cls: string }> = {
-  fits: { label: "Подходит вашей Гранте", cls: "border-fit-ok/40 bg-fit-ok/10 text-fit-ok" },
-  no: { label: "Не подходит вашей модификации", cls: "border-fit-no/40 bg-fit-no/10 text-fit-no" },
-  unknown: {
-    label: "Совместимость не подтверждена",
-    cls: "border-fit-unknown/40 bg-fit-unknown/10 text-fit-unknown",
-  },
+// Вердикт о посадке — pill на цветной подложке, как активная реакция у референса.
+// Три состояния равноправны: «не подтверждено» не маскируется под «подходит».
+const map: Record<Fitment, { label: string; short: string; cls: string }> = {
+  fits: { label: "Подходит вашей Гранте", short: "Встаёт", cls: "bg-fit-ok-surface text-fit-ok" },
+  no: { label: "Не подходит вашей модификации", short: "Не встаёт", cls: "bg-fit-no-surface text-fit-no" },
+  unknown: { label: "Совместимость не подтверждена", short: "Не проверено", cls: "bg-fit-unknown-surface text-fit-unknown" },
 };
+
+export const fitmentText = (f: Fitment) => map[f].label;
 
 export function FitBadge({
   fitment,
@@ -25,13 +24,22 @@ export function FitBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border font-medium",
-        size === "sm" ? "px-2 py-0.5 text-[11px]" : "px-2.5 py-1 text-xs",
+        "inline-flex items-center rounded-full font-bold whitespace-nowrap",
+        size === "sm" ? "h-6 px-2 text-[11px]" : "h-8 px-3 text-xs",
         s.cls,
         className,
       )}
     >
-      {s.label}
+      {size === "sm" ? s.short : s.label}
+    </span>
+  );
+}
+
+// Компактная подпись «встало / дорабатывал» для строк и подписей
+export function ReworkLabel({ reworked, className }: { reworked: boolean; className?: string }) {
+  return (
+    <span className={cn("font-medium", reworked ? "text-fit-rework" : "text-fit-ok", className)}>
+      {reworked ? "Дорабатывал" : "Встало без доработок"}
     </span>
   );
 }

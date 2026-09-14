@@ -1,10 +1,8 @@
 "use client";
 
-import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
-// Сегмент-контрол с скользящим индикатором. Один на весь продукт — второго способа
-// переключать режим в библиотеке нет.
+// Сегмент-контрол в их языке: подложка vote-control, активный сегмент — белая pill, 12/700.
 export function Segmented<T extends string>({
   options,
   value,
@@ -17,7 +15,7 @@ export function Segmented<T extends string>({
   className?: string;
 }) {
   return (
-    <div className={cn("flex gap-1 rounded-full border border-border bg-muted p-1", className)}>
+    <div className={cn("flex gap-1 rounded-[76px] bg-vote-control p-1", className)}>
       {options.map((o) => {
         const active = o.value === value;
         return (
@@ -25,18 +23,13 @@ export function Segmented<T extends string>({
             key={o.value}
             type="button"
             onClick={() => onChange(o.value)}
-            className="relative min-h-[44px] flex-1 rounded-full px-3 text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            {active && (
-              <motion.span
-                layoutId="segmented-active"
-                transition={{ type: "spring", stiffness: 340, damping: 28 }}
-                className="absolute inset-0 rounded-full bg-card ring-1 ring-border"
-              />
+            aria-pressed={active}
+            className={cn(
+              "motion-interactive motion-pressable min-h-[36px] flex-1 rounded-[76px] px-3 text-xs font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              active ? "bg-surface text-text-primary shadow-[0_1px_2px_hsl(240_8%_8%/0.06)]" : "text-text-secondary hover:text-text-primary",
             )}
-            <span className={cn("relative z-10", active ? "text-foreground" : "text-muted-foreground")}>
-              {o.label}
-            </span>
+          >
+            {o.label}
           </button>
         );
       })}

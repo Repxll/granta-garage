@@ -7,8 +7,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -40,97 +40,168 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-fit-ok: var(--fit-ok);
+  --color-fit-ok-surface: var(--fit-ok-surface);
   --color-fit-rework: var(--fit-rework);
+  --color-fit-rework-surface: var(--fit-rework-surface);
   --color-fit-no: var(--fit-no);
+  --color-fit-no-surface: var(--fit-no-surface);
   --color-fit-unknown: var(--fit-unknown);
+  --color-fit-unknown-surface: var(--fit-unknown-surface);
   --color-respect: var(--respect);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
+  --color-respect-surface: var(--respect-surface);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-icon-primary: var(--icon-primary);
+  --color-control-surface: var(--control-surface);
+  --color-control-hover: var(--control-hover);
+  --color-control-border: var(--control-border);
+  --color-content-border: var(--content-border);
+  --color-vote-control: var(--vote-control);
+  --color-vote-up: var(--vote-up);
+  --color-vote-up-surface: var(--vote-up-surface);
+  --color-vote-down: var(--vote-down);
+  --color-vote-down-surface: var(--vote-down-surface);
+  --radius-sm: 8px;
+  --radius-md: 12px;
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-xl: 20px;
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 :root {
-  /* Визуальный язык снят с design30.club: светлый почти-монохром, тёплый серый фон,
-     белые карточки без теней (разделение цветом, а не тенью), крупные радиусы,
-     чёрная кнопка как основное действие, цвет — точечно. */
-  --background: #F0F0F2;
-  --foreground: #0C0C0E;
-  --card: #FFFFFF;
-  --card-foreground: #0C0C0E;
-  --popover: #FFFFFF;
-  --popover-foreground: #0C0C0E;
-  --primary: #0C0C0E;
-  --primary-foreground: #FFFFFF;
-  --secondary: #E3E3E7;
-  --secondary-foreground: #0C0C0E;
-  --muted: #E9E9ED;
-  --muted-foreground: #585862;
-  --accent: #E9E9ED;
-  --accent-foreground: #0C0C0E;
-  --destructive: #D62828;
-  --border: #E3E3E7;
-  --input: #E3E3E7;
-  --ring: #0C0C0E;
+  /* Токены сняты с design30.club один в один (HSL-триплеты их системы), а не «по мотивам».
+     Светлый почти-монохром: тёплый серый фон, белые поверхности без теней, чёрный контрол. */
+  --background: hsl(240 7% 94.5%);
+  --foreground: hsl(240 8% 5.1%);
+  --surface: hsl(240 10% 100%);
+  --surface-muted: hsl(240 8% 97%);
+  --text-primary: hsl(240 8% 5.1%);
+  --text-secondary: hsl(240 5% 36.5%);
+  --icon-primary: hsl(240 8% 5.1%);
+  --control-surface: hsl(240 10% 99%);
+  --control-hover: hsl(240 10% 93%);
+  --control-border: hsl(240 8% 8% / 0.1);
+  --control-ring: hsl(240 8% 5.1%);
+  --content-border: hsl(240 8% 52% / 0.13);
+  --vote-control: hsl(240 8% 94.9% / 0.8);
+  --vote-up: hsl(158 84% 39%);
+  --vote-up-surface: hsl(158 84% 39% / 0.12);
+  --vote-down: hsl(0 84% 60%);
+  --vote-down-surface: hsl(0 84% 60% / 0.14);
+  --popover-shadow: 0 12px 32px -8px hsl(240 8% 8% / 0.18), 0 2px 8px hsl(240 8% 8% / 0.06);
 
-  /* Семантика продукта: вердикт о посадке. Три состояния равноправны,
-     «не подтверждено» не маскируется под «подходит». Контраст выверен под белую карточку. */
-  --fit-ok: #1B7F3B;
-  --fit-rework: #A06A00;
-  --fit-no: #D62828;
-  --fit-unknown: #585862;
-  /* Респект — единственное живое пятно, как красный логотип в референсе */
-  --respect: #FF2929;
+  /* shadcn-слой поверх их токенов */
+  --card: var(--surface);
+  --card-foreground: var(--text-primary);
+  --popover: var(--surface);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--text-primary);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: var(--control-surface);
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--surface-muted);
+  --muted-foreground: var(--text-secondary);
+  --accent: var(--control-hover);
+  --accent-foreground: var(--text-primary);
+  --destructive: var(--vote-down);
+  --border: hsl(240 8% 89.8%);
+  --input: var(--control-border);
+  --ring: var(--control-ring);
+
+  /* Семантика продукта — вердикт о посадке. На их палитре: up/down + янтарь трофея. */
+  --fit-ok: var(--vote-up);
+  --fit-ok-surface: var(--vote-up-surface);
+  --fit-rework: hsl(38 85% 46%);
+  --fit-rework-surface: hsl(38 85% 55% / 0.16);
+  --fit-no: var(--vote-down);
+  --fit-no-surface: var(--vote-down-surface);
+  --fit-unknown: var(--text-secondary);
+  --fit-unknown-surface: var(--vote-control);
+  /* Респект — как их лайк: сердце, красный только в активном состоянии */
+  --respect: hsl(4 96% 58%);
+  --respect-surface: hsl(4 96% 58% / 0.12);
+
+  /* Движение — их длительности и кривые */
+  --motion-duration-press: 0.11s;
+  --motion-duration-fast: 0.16s;
+  --motion-duration-base: 0.22s;
+  --motion-duration-slow: 0.3s;
+  --motion-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --motion-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --motion-ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 
   --radius: 0.875rem;
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #0C0C0E;
-  --sidebar-primary: #0C0C0E;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #E9E9ED;
-  --sidebar-accent-foreground: #0C0C0E;
-  --sidebar-border: #E3E3E7;
-  --sidebar-ring: #0C0C0E;
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: var(--text-primary);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: var(--control-hover);
+  --sidebar-accent-foreground: var(--text-primary);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--control-ring);
 }
 
 .dark {
-  /* Тёмный вариант той же системы — на случай, если понадобится. Продукт по умолчанию светлый. */
-  --background: #0C0C0E;
-  --foreground: #F0F0F2;
-  --card: #161619;
-  --card-foreground: #F0F0F2;
-  --popover: #161619;
-  --popover-foreground: #F0F0F2;
-  --primary: #F0F0F2;
-  --primary-foreground: #0C0C0E;
-  --secondary: #222228;
-  --secondary-foreground: #F0F0F2;
-  --muted: #1B1B1F;
-  --muted-foreground: #9A9AA6;
-  --accent: #222228;
-  --accent-foreground: #F0F0F2;
-  --destructive: #FF5A5A;
-  --border: #26262C;
-  --input: #26262C;
-  --ring: #F0F0F2;
+  /* Их тёмная тема — тоже один в один. */
+  --background: hsl(0 0% 0%);
+  --foreground: hsl(240 8% 96%);
+  --surface: hsl(0 0% 0%);
+  --surface-muted: hsl(240 8% 16%);
+  --text-primary: hsl(240 8% 96%);
+  --text-secondary: hsl(240 5% 72%);
+  --icon-primary: hsl(240 5% 72%);
+  --control-surface: hsl(240 8% 18%);
+  --control-hover: hsl(240 7% 25%);
+  --control-border: hsl(240 7% 28%);
+  --control-ring: hsl(240 8% 86%);
+  --content-border: hsl(240 7% 28%);
+  --vote-control: hsl(240 8% 18%);
+  --vote-up: hsl(158 74% 58%);
+  --vote-up-surface: hsl(158 74% 58% / 0.18);
+  --vote-down: hsl(0 86% 70%);
+  --vote-down-surface: hsl(0 86% 70% / 0.18);
+  --popover-shadow: 0 12px 32px -8px hsl(0 0% 0% / 0.6);
 
-  --fit-ok: #4CC46A;
-  --fit-rework: #E0A400;
-  --fit-no: #FF5A5A;
-  --fit-unknown: #9A9AA6;
-  --respect: #FF4444;
+  --card: hsl(240 8% 8%);
+  --card-foreground: var(--text-primary);
+  --popover: hsl(240 8% 8%);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--text-primary);
+  --primary-foreground: hsl(0 0% 0%);
+  --secondary: var(--control-surface);
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--surface-muted);
+  --muted-foreground: var(--text-secondary);
+  --accent: var(--control-hover);
+  --accent-foreground: var(--text-primary);
+  --destructive: var(--vote-down);
+  --border: hsl(240 8% 14.9%);
+  --input: var(--control-border);
+  --ring: var(--control-ring);
 
-  --sidebar: #161619;
-  --sidebar-foreground: #F0F0F2;
-  --sidebar-primary: #F0F0F2;
-  --sidebar-primary-foreground: #0C0C0E;
-  --sidebar-accent: #222228;
-  --sidebar-accent-foreground: #F0F0F2;
-  --sidebar-border: #26262C;
-  --sidebar-ring: #F0F0F2;
+  --fit-ok: var(--vote-up);
+  --fit-ok-surface: var(--vote-up-surface);
+  --fit-rework: hsl(38 90% 62%);
+  --fit-rework-surface: hsl(38 90% 62% / 0.18);
+  --fit-no: var(--vote-down);
+  --fit-no-surface: var(--vote-down-surface);
+  --fit-unknown: var(--text-secondary);
+  --fit-unknown-surface: var(--vote-control);
+  --respect: hsl(4 90% 66%);
+  --respect-surface: hsl(4 90% 66% / 0.18);
+
+  --sidebar: hsl(240 8% 8%);
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: var(--text-primary);
+  --sidebar-primary-foreground: hsl(0 0% 0%);
+  --sidebar-accent: var(--control-hover);
+  --sidebar-accent-foreground: var(--text-primary);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--control-ring);
 }
 
 @layer base {
@@ -143,4 +214,62 @@
   html {
     @apply font-sans;
   }
+}
+
+/* ---------- Движение: утилиты, снятые с их CSS ---------- */
+@layer utilities {
+  .motion-interactive {
+    transition-property: background-color, border-color, box-shadow, color, filter, opacity, transform;
+    transition-duration: var(--motion-duration-base);
+    transition-timing-function: var(--motion-ease-out);
+  }
+  .motion-pressable {
+    --motion-press-scale: 1;
+    transform: scale(var(--motion-press-scale));
+  }
+  .motion-pressable:active:not(:disabled, [aria-disabled="true"], [data-disabled]) {
+    --motion-press-scale: 0.97;
+    transition-duration: var(--motion-duration-press);
+  }
+  .motion-icon-feedback [data-icon-container] {
+    --motion-icon-scale: 1;
+    transform: scale(var(--motion-icon-scale));
+    transition: transform var(--motion-duration-base) var(--motion-ease-out);
+  }
+  .motion-icon-feedback:hover [data-icon-container] { --motion-icon-scale: 1.06; }
+  .motion-icon-feedback:active [data-icon-container] { --motion-icon-scale: 0.92; }
+
+  .motion-fade-in {
+    animation: motion-fade-in var(--motion-duration-base) var(--motion-ease-out) both;
+  }
+
+  /* Скелетон с бегущим бликом — как у них: surface-muted + псевдоэлемент слева направо */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+    background: var(--surface-muted);
+  }
+  .shimmer::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 -100%;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.6), transparent);
+    animation: shimmer 1.4s var(--motion-ease-in-out) infinite;
+  }
+
+  .tabular { font-variant-numeric: tabular-nums; }
+}
+
+@keyframes motion-fade-in {
+  0% { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  to { transform: translateX(200%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-fade-in, .shimmer::before { animation: none; }
+  .motion-pressable, .motion-icon-feedback [data-icon-container] { transform: none !important; }
 }

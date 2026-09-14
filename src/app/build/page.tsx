@@ -1,70 +1,86 @@
 "use client";
 
-import { Send } from "lucide-react";
+import { ArrowUpTrayIcon } from "@heroicons/react/24/solid";
 import { useApp } from "@/lib/state";
-import { carLabel } from "@/lib/car";
+import { bodies, modifications, parts } from "@/lib/data";
 import { partName } from "@/lib/parts";
-import { Screen, Stagger, StaggerItem } from "@/components/garage/screen";
-import { MoneyStat, Money } from "@/components/garage/money";
-import { RespectButton } from "@/components/garage/respect-button";
-import { LoadingScreen } from "@/components/garage/load-state";
+import { Screen, AppHeader, FadeIn } from "@/components/garage/screen";
+import { VoteControl } from "@/components/garage/vote-control";
+import { InstallCard } from "@/components/garage/install-card";
+import { IconButton } from "@/components/garage/icon-button";
+import { ListSkeleton } from "@/components/garage/skeletons";
 import { Button } from "@/components/ui/button";
 import { plural } from "@/lib/format";
 
-// Экран 8: публичная сборка в режиме превью — респект себе поставить нельзя,
-// это проверяет и сервер.
+// Экран 8: публичная сборка — так её видят другие. Респект себе заблокирован и на сервере.
 export default function BuildPage() {
   const { state, loading } = useApp();
-  if (loading) return <LoadingScreen title="Сборка" />;
-
   const garage = state?.garage ?? [];
   const total = garage.reduce((s, i) => s + i.price + i.work_price, 0);
+  const body = bodies.find((b) => b.code === state?.car.body);
+  const mod = modifications.find((m) => m.id === state?.car.modification);
 
   return (
     <Screen
-      title="Сборка"
-      subtitle="Так вашу сборку видят другие владельцы Гранты."
-      car={carLabel(state?.car.body ?? null, state?.car.modification ?? null)}
+      header={<AppHeader title="Сборка" back="/profile" action={<IconButton icon={ArrowUpTrayIcon} label="Поделиться" />} />}
     >
-      <MoneyStat
-        label="Вложено"
-        value={total}
-        accent
-        hint={`${garage.length} ${plural(garage.length, "доработка", "доработки", "доработок")}`}
-      />
-
-      {garage.length === 0 ? (
-        <p className="pt-5 text-sm text-muted-foreground">В сборке пока ничего нет.</p>
+      {loading ? (
+        <ListSkeleton count={2} kind="card" />
       ) : (
-        <Stagger className="flex flex-col gap-2 pt-5">
-          {garage.map((i) => (
-            <StaggerItem key={i.part_slug}>
-              <div className="rounded-lg border border-border bg-card p-3">
-                <div className="text-sm font-semibold">{partName(i.part_slug)}</div>
-                <div className="pt-1 text-sm">
-                  <Money value={i.price + i.work_price} />
-                  <span className={i.reworked ? "text-fit-rework" : "text-fit-ok"}>
-                    {" · "}
-                    {i.reworked ? "с доработкой" : "встало как есть"}
-                  </span>
-                </div>
-                <div className="pt-3">
-                  <RespectButton count={0} locked />
-                </div>
+        <>
+          <FadeIn>
+            <div className="flex flex-col items-center pt-2 text-center">
+              <p className="text-sm text-text-secondary">Так вашу сборку видят другие владельцы Гранты</p>
+              <p className="pt-1 text-base font-semibold text-text-primary">
+                {body?.name}, {mod?.name}
+              </p>
+              <div className="pt-5">
+                <VoteControl
+                  value={total}
+                  label={`${garage.length} ${plural(garage.length, "доработка", "доработки", "доработок")}`}
+                  chevrons={false}
+                  suffix="₽"
+                />
               </div>
-            </StaggerItem>
-          ))}
-        </Stagger>
+            </div>
+          </FadeIn>
+
+          <div className="flex flex-col gap-6 pt-6">
+            {garage.length === 0 ? (
+              <p className="text-center text-sm text-text-secondary">В сборке пока ничего нет.</p>
+            ) : (
+              garage.map((i, idx) => {
+                const part = parts.find((p) => p.slug === i.part_slug);
+                return (
+                  <FadeIn key={i.part_slug} index={idx + 1}>
+                    <InstallCard
+                      partName={partName(i.part_slug)}
+                      partSpec={part?.spec}
+                      partHref={`/part/${i.part_slug}`}
+                      total={i.price + i.work_price}
+                      reworked={i.reworked}
+                      author={state?.user.name ?? "Владелец"}
+                      authorMeta={`${body?.name}, ${mod?.name}`}
+                      respects={0}
+                      respectLocked
+                      note={i.review_text}
+                    />
+                  </FadeIn>
+                );
+              })
+            )}
+          </div>
+
+          <div className="pt-6">
+            <Button size="xl" className="w-full">
+              Отправить в чат клуба
+            </Button>
+            <p className="px-1 pt-3 text-center text-xs text-text-secondary">
+              Ссылка открывается внутри Telegram. Веб-страницу сборки включим вместе с публичным слоем.
+            </p>
+          </div>
+        </>
       )}
-
-      <Button className="mt-6 w-full">
-        <Send size={16} />
-        Отправить в чат клуба
-      </Button>
-
-      <p className="pt-3 text-xs text-muted-foreground">
-        Ссылка открывается внутри Telegram. Веб-страницу сборки включим вместе с публичным слоем.
-      </p>
     </Screen>
   );
 }

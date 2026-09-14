@@ -2,11 +2,6 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { StateProvider } from "@/lib/state";
-import { MotionConfig } from "motion/react";
-import { Geist } from "next/font/google";
-import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: "Гараж — тюнинг Лады Гранты",
@@ -14,16 +9,15 @@ export const metadata: Metadata = {
     "Встанет или нет и что ещё придётся купить — по опыту тех, кто уже поставил, а не по советам из треда.",
 };
 
+// Шрифт системный, как у референса. Тема светлая по умолчанию; .dark описан в токенах.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={cn("font-sans", geist.variable)}>
-      <body className="bg-background text-foreground antialiased">
+    <html lang="ru" className="font-sans">
+      <body className="bg-background text-text-primary antialiased">
         {/* Mini App: грузим после гидратации — beforeInteractive правит style у <html>
             раньше React и ломает гидратацию. Каркас работает и в обычном браузере. */}
         <Script src="https://telegram.org/js/telegram-web-app.js" strategy="afterInteractive" />
-        <MotionConfig reducedMotion="user">
-          <StateProvider>{children}</StateProvider>
-        </MotionConfig>
+        <StateProvider>{children}</StateProvider>
       </body>
     </html>
   );

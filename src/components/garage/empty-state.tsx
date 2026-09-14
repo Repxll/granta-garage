@@ -1,31 +1,27 @@
-import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Icon, type HeroIcon } from "./icon";
 
-// Пустое состояние: иконка, что случилось и что делать. Один компонент на весь продукт —
-// второго способа показать пустоту в библиотеке нет.
+// Пустое состояние — белая карточка 14px, иконка 24, заголовок 16/600, подсказка 14 вторичным.
 export function EmptyState({
-  icon: Icon,
+  icon,
   title,
   hint,
   action,
   className,
 }: {
-  icon: LucideIcon;
+  icon: HeroIcon;
   title: string;
   hint: string;
   action?: React.ReactNode;
   className?: string;
 }) {
   return (
-    <div
-      className={cn(
-        "flex flex-col items-center rounded-lg border border-dashed border-border px-4 py-8 text-center",
-        className,
-      )}
-    >
-      <Icon size={28} className="text-muted-foreground" strokeWidth={1.6} />
-      <div className="pt-3 text-sm font-semibold">{title}</div>
-      <p className="max-w-[260px] pt-1 text-xs text-muted-foreground">{hint}</p>
+    <div className={cn("motion-fade-in flex flex-col items-center rounded-[14px] bg-surface px-5 py-8 text-center", className)}>
+      <span className="flex size-12 items-center justify-center rounded-full bg-surface-muted text-text-secondary">
+        <Icon icon={icon} size={24} />
+      </span>
+      <div className="pt-3 text-base font-semibold text-text-primary">{title}</div>
+      <p className="max-w-[280px] pt-1 text-sm text-text-secondary">{hint}</p>
       {action && <div className="pt-4">{action}</div>}
     </div>
   );

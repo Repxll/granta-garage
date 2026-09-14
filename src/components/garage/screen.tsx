@@ -2,54 +2,68 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Layers, Wrench, User } from "lucide-react";
-import { motion } from "motion/react";
+import { ArrowLeftIcon, RectangleStackIcon, WrenchScrewdriverIcon, UserIcon } from "@heroicons/react/24/solid";
 import { cn } from "@/lib/utils";
+import { Icon } from "./icon";
+import { IconButton } from "./icon-button";
 
-// Каркас экрана Mini App: чип машины сверху, таб-бар снизу, колонка под телефон.
-
-export function CarChip({ car, className }: { car: string | null; className?: string }) {
-  if (!car) return null;
+// Шапка экрана с референса: sticky, h-12, белая, hairline снизу; назад слева,
+// заголовок 16/600, действие справа.
+export function AppHeader({
+  title,
+  back,
+  action,
+  className,
+}: {
+  title: string;
+  back?: string | (() => void);
+  action?: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div
+    <header
       className={cn(
-        "sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-border bg-background/95 px-4 py-2.5 backdrop-blur",
+        "sticky top-0 z-40 flex h-12 shrink-0 items-center justify-between gap-3 border-b border-border bg-surface px-3",
         className,
       )}
     >
-      <span className="truncate text-xs text-muted-foreground">
-        Ваша Гранта: <span className="font-medium text-foreground">{car}</span>
-      </span>
-      <Link href="/" className="shrink-0 text-xs underline decoration-foreground/30 underline-offset-4 hover:decoration-foreground">
-        Изменить
-      </Link>
-    </div>
+      <div className="flex min-w-0 items-center gap-1">
+        {back !== undefined &&
+          (typeof back === "string" ? (
+            <IconButton icon={ArrowLeftIcon} label="Назад" href={back} />
+          ) : (
+            <IconButton icon={ArrowLeftIcon} label="Назад" onClick={back} />
+          ))}
+        <h1 className={cn("truncate text-base font-semibold text-text-primary", back === undefined && "pl-1")}>{title}</h1>
+      </div>
+      {action ? <div className="flex shrink-0 items-center gap-1">{action}</div> : <span className="size-10" />}
+    </header>
   );
 }
 
 const tabs = [
-  { href: "/feed", label: "Лента", icon: Layers },
-  { href: "/catalog", label: "Каталог", icon: Wrench },
-  { href: "/profile", label: "Профиль", icon: User },
+  { href: "/feed", label: "Лента", icon: RectangleStackIcon },
+  { href: "/catalog", label: "Каталог", icon: WrenchScrewdriverIcon },
+  { href: "/profile", label: "Профиль", icon: UserIcon },
 ];
 
 export function TabBar() {
   const path = usePathname();
   return (
-    <nav className="sticky bottom-0 z-20 grid grid-cols-3 border-t border-border bg-background/95 backdrop-blur">
+    <nav className="sticky bottom-0 z-40 grid grid-cols-3 border-t border-border bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
       {tabs.map((t) => {
         const active = path.startsWith(t.href);
-        const Icon = t.icon;
         return (
           <Link
             key={t.href}
             href={t.href}
             className={cn(
-              "flex min-h-[52px] flex-col items-center justify-center gap-0.5 text-[11px] outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
-              active ? "text-primary" : "text-muted-foreground",
+              "motion-interactive motion-icon-feedback motion-pressable flex min-h-[52px] flex-col items-center justify-center gap-0.5 text-[11px] font-medium",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+              active ? "text-text-primary" : "text-text-secondary/70",
             )}
           >
-            <Icon size={18} strokeWidth={active ? 2.4 : 1.8} />
+            <Icon icon={t.icon} size={20} />
             {t.label}
           </Link>
         );
@@ -58,60 +72,44 @@ export function TabBar() {
   );
 }
 
+// Каркас экрана: серый фон страницы, колонка 480, контент с полями 16.
 export function Screen({
-  title,
-  subtitle,
-  car,
   children,
+  header,
   tabs: withTabs = true,
+  padded = true,
+  className,
 }: {
-  title: string;
-  subtitle?: string;
-  car?: string | null;
   children: React.ReactNode;
+  header?: React.ReactNode;
   tabs?: boolean;
+  padded?: boolean;
+  className?: string;
 }) {
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-background text-foreground">
-      <CarChip car={car ?? null} />
-      <main className="flex-1 px-4 pt-5 pb-6">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.22, ease: "easeOut" }}
-        >
-          <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
-          {subtitle && <p className="pt-1 text-sm text-muted-foreground">{subtitle}</p>}
-        </motion.div>
-        <div className="pt-5">{children}</div>
-      </main>
+    <div className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-background text-text-primary">
+      {header}
+      <main className={cn("flex-1", padded && "px-4 pt-4 pb-6", className)}>{children}</main>
       {withTabs && <TabBar />}
     </div>
   );
 }
 
-// Каскад появления списка: 24 мс на элемент с потолком, чтобы длинный список
-// не превращался в ожидание.
-export function Stagger({ children, className }: { children: React.ReactNode; className?: string }) {
+// Появление списка каскадом: их motion-fade-in с задержкой на элемент, потолок — 10 элементов.
+export function FadeIn({ index = 0, children, className }: { index?: number; children: React.ReactNode; className?: string }) {
   return (
-    <motion.div
-      className={className}
-      initial="hidden"
-      animate="show"
-      variants={{ show: { transition: { staggerChildren: 0.024, delayChildren: 0.04 } } }}
-    >
+    <div className={cn("motion-fade-in", className)} style={{ animationDelay: `${Math.min(index, 10) * 28}ms` }}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
-export function StaggerItem({ children }: { children: React.ReactNode }) {
+// Заголовок страницы над контентом (там, где нет шапки): 32/700 как их display-sm, подзаголовок 16 вторичным
+export function PageTitle({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <motion.div
-      variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
-    >
-      {children}
-    </motion.div>
+    <div className="motion-fade-in pb-4">
+      <h1 className="text-[28px] font-bold leading-tight tracking-tight text-text-primary text-balance">{title}</h1>
+      {subtitle && <p className="pt-2 text-base leading-6 text-text-secondary">{subtitle}</p>}
+    </div>
   );
 }
