@@ -63,6 +63,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 дата 14; `CommentComposer` — поле радиусом 20, смайлик, круглая кнопка 48) · `ReactionRow` +
 `ReactionStat` (число 18·700 + иконка 20, справа под медиа) · `ReviewsThread` / `ReviewsSheet`.
 
+Экран гаража (`/profile`) — по банковскому экрану «моя машина» (референс Ильи, Т-Банк Авто):
+`GarageHero` (тёмный hero, имя 32/700, чип модификации, `CarSilhouette` по кузову, точки),
+`StatusCard` (события, тёмно-зелёный/янтарный градиент), `Sheet24` (лист скруглением 24),
+`QuickTiles`/`QuickTile` (плитки 64/16 на пастельных подложках). Картинка машины — свой SVG.
+
 Тема следует `Telegram.WebApp.colorScheme` (класс `.dark` на html); в браузере — `?theme=dark`.
 Отзывы = комментарии референса, но писать может только тот, кто деталь поставил.
 
