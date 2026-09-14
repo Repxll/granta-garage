@@ -29,7 +29,7 @@ HMAC заново (`src/server/telegram.ts`). Без этого любой мо�
 | Переменная | Где | Зачем |
 |---|---|---|
 | `TELEGRAM_BOT_TOKEN` | локально и на проде | проверка подписи initData, отправка пушей |
-| `DATABASE_URL` | только прод | Neon Postgres; без неё поднимается локальный PGlite |
+| `DATABASE_URL` | прод (и в .env.local от Vercel) | Neon Postgres. Локально **не используется**: PGlite включается всегда, кроме `NODE_ENV=production` или явного `USE_REMOTE_DB=1` — чтобы разработка не писала в боевую базу |
 | `CRON_SECRET` | только прод | защищает `/api/cron/ask` от посторонних вызовов |
 | `ALLOW_DEV_USER` | только локально | фиктивный пользователь вместо Telegram |
 

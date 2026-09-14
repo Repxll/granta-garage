@@ -10,10 +10,13 @@ let ready: Promise<void> | null = null;
 
 async function createQuery(): Promise<Query> {
   const url = process.env.DATABASE_URL;
+  // Vercel кладёт продовый DATABASE_URL и в локальный .env.local. Без этой проверки
+  // разработка писала бы в боевую базу: локально всегда PGlite, если не попросили иначе.
+  const useRemote = Boolean(url) && (process.env.NODE_ENV === "production" || process.env.USE_REMOTE_DB === "1");
 
-  if (url) {
+  if (useRemote) {
     const { neon } = await import("@neondatabase/serverless");
-    const sql = neon(url);
+    const sql = neon(url!);
     return async (text, params = []) => (await sql.query(text, params)) as Row[];
   }
 
