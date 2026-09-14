@@ -20,7 +20,7 @@ export function CarChip({ car, className }: { car: string | null; className?: st
       <span className="truncate text-xs text-muted-foreground">
         Ваша Гранта: <span className="font-medium text-foreground">{car}</span>
       </span>
-      <Link href="/" className="shrink-0 text-xs text-primary hover:underline">
+      <Link href="/" className="shrink-0 text-xs underline decoration-foreground/30 underline-offset-4 hover:decoration-foreground">
         Изменить
       </Link>
     </div>

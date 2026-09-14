@@ -108,8 +108,8 @@ export default function ProfilePage() {
             </Link>
 
             {pending > 0 && (
-              <div className="mt-4 rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">
-                <div className="font-semibold text-primary">Через две недели спросим, как оно</div>
+              <div className="mt-4 rounded-lg border border-border bg-card p-3 text-sm">
+                <div className="font-semibold">Через две недели спросим, как оно</div>
                 <p className="pt-1 text-muted-foreground">
                   По {pending} {plural(pending, "детали", "деталям", "деталям")} придёт сообщение
                   «ну как, встало нормально?» — ответ станет отзывом для тех, кто выбирает то же самое.

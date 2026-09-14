@@ -17,7 +17,7 @@ export function Segmented<T extends string>({
   className?: string;
 }) {
   return (
-    <div className={cn("flex gap-1 rounded-lg border border-border bg-muted p-1", className)}>
+    <div className={cn("flex gap-1 rounded-full border border-border bg-muted p-1", className)}>
       {options.map((o) => {
         const active = o.value === value;
         return (
@@ -25,13 +25,13 @@ export function Segmented<T extends string>({
             key={o.value}
             type="button"
             onClick={() => onChange(o.value)}
-            className="relative min-h-[44px] flex-1 rounded-md px-3 text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="relative min-h-[44px] flex-1 rounded-full px-3 text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {active && (
               <motion.span
                 layoutId="segmented-active"
                 transition={{ type: "spring", stiffness: 340, damping: 28 }}
-                className="absolute inset-0 rounded-md bg-card shadow-sm ring-1 ring-border"
+                className="absolute inset-0 rounded-full bg-card ring-1 ring-border"
               />
             )}
             <span className={cn("relative z-10", active ? "text-foreground" : "text-muted-foreground")}>

@@ -21,15 +21,15 @@ const swatch = (name: string, varName: string, purpose: string) => (
 );
 
 export const Colors: Story = {
-  name: "Палитра — тёмный гаражный",
+  name: "Палитра — светлый монохром",
   render: () => (
     <div className="flex flex-col gap-5">
       <section>
         <h2 className="pb-3 text-sm font-semibold">Поверхности</h2>
         <div className="flex flex-col gap-3">
-          {swatch("Фон", "--background", "Графит, не чёрный: на OLED чёрный проваливается, графит держит форму карточек")}
-          {swatch("Карточка", "--card", "Всё содержимое лежит на ней")}
-          {swatch("Граница", "--border", "Вместо теней: на тёмном фоне тени не читаются")}
+          {swatch("Фон", "--background", "Тёплый серый, не белый: на нём белые карточки читаются без теней")}
+          {swatch("Карточка", "--card", "Чистый белый. Разделение цветом, а не тенью — теней в системе нет")}
+          {swatch("Граница", "--border", "Тонкая, только там, где нужен край")}
           {swatch("Приглушённый", "--muted", "Подложка сегмент-контрола")}
         </div>
       </section>
@@ -37,8 +37,8 @@ export const Colors: Story = {
       <section>
         <h2 className="pb-3 text-sm font-semibold">Акцент</h2>
         <div className="flex flex-col gap-3">
-          {swatch("Янтарь", "--primary", "Свет лампы в боксе. Единственный акцент — им подсвечивается только действие")}
-          {swatch("Респект", "--respect", "Тот же янтарь: социальный жест и есть действие")}
+          {swatch("Основное действие", "--primary", "Почти чёрный. Кнопка — это форма и вес, а не цвет")}
+          {swatch("Респект", "--respect", "Единственное живое пятно в системе, как красный логотип в референсе")}
         </div>
       </section>
 
@@ -87,7 +87,7 @@ export const Typography: Story = {
 };
 
 export const Radii: Story = {
-  name: "Радиусы и плотность",
+  name: "Радиусы: крупные, кнопки — pill",
   render: () => (
     <div className="flex items-end gap-3">
       {["rounded-md", "rounded-lg", "rounded-xl"].map((r) => (
@@ -97,7 +97,7 @@ export const Radii: Story = {
         </div>
       ))}
       <p className="pb-1 text-xs text-muted-foreground">
-        Радиусы небольшие — техничность важнее мягкости.
+        Базовый радиус 14px, кнопки и бейджи — полностью скруглённые.
       </p>
     </div>
   ),

@@ -23,7 +23,7 @@ export function RespectButton({
     return (
       <span
         className={cn(
-          "inline-flex min-h-[44px] items-center gap-1.5 rounded-md border border-border px-3.5 text-xs text-muted-foreground",
+          "inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-border px-4 text-xs text-muted-foreground",
           className,
         )}
       >
@@ -40,7 +40,7 @@ export function RespectButton({
       transition={{ type: "spring", stiffness: 320, damping: 26 }}
       aria-pressed={active}
       className={cn(
-        "inline-flex min-h-[44px] items-center gap-1.5 rounded-md border px-3.5 text-xs font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "inline-flex min-h-[44px] items-center gap-1.5 rounded-full border px-4 text-xs font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         active
           ? "border-respect bg-respect text-primary-foreground"
           : "border-border text-foreground hover:border-respect/60 hover:text-respect",

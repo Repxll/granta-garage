@@ -42,7 +42,7 @@ export function FeedCard({
       </div>
       <div className="text-xs text-muted-foreground">{car}</div>
 
-      <Link href={partHref} className="mt-2 block text-sm font-medium text-primary hover:underline">
+      <Link href={partHref} className="mt-2 block text-sm font-medium underline decoration-foreground/25 underline-offset-4 hover:decoration-foreground">
         {partName}
       </Link>
 

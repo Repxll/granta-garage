@@ -16,8 +16,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    // Продукт всегда тёмный: «тёмный гаражный» — фирменный стиль, а не системная тема
-    <html lang="ru" className={cn("dark font-sans", geist.variable)}>
+    <html lang="ru" className={cn("font-sans", geist.variable)}>
       <body className="bg-background text-foreground antialiased">
         {/* Mini App: грузим после гидратации — beforeInteractive правит style у <html>
             раньше React и ломает гидратацию. Каркас работает и в обычном браузере. */}

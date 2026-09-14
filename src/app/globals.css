@@ -54,83 +54,83 @@
 }
 
 :root {
-  /* Светлый вариант той же системы — запасной. Продукт по умолчанию тёмный. */
-  --background: #F4F5F7;
-  --foreground: #16181C;
+  /* Визуальный язык снят с design30.club: светлый почти-монохром, тёплый серый фон,
+     белые карточки без теней (разделение цветом, а не тенью), крупные радиусы,
+     чёрная кнопка как основное действие, цвет — точечно. */
+  --background: #F0F0F2;
+  --foreground: #0C0C0E;
   --card: #FFFFFF;
-  --card-foreground: #16181C;
+  --card-foreground: #0C0C0E;
   --popover: #FFFFFF;
-  --popover-foreground: #16181C;
-  --primary: #C86A00;
+  --popover-foreground: #0C0C0E;
+  --primary: #0C0C0E;
   --primary-foreground: #FFFFFF;
-  --secondary: #E7E9ED;
-  --secondary-foreground: #16181C;
-  --muted: #EDEFF2;
-  --muted-foreground: #5C646F;
-  --accent: #EDEFF2;
-  --accent-foreground: #16181C;
-  --destructive: #C0392B;
-  --border: #DCDFE4;
-  --input: #DCDFE4;
-  --ring: #C86A00;
+  --secondary: #E3E3E7;
+  --secondary-foreground: #0C0C0E;
+  --muted: #E9E9ED;
+  --muted-foreground: #585862;
+  --accent: #E9E9ED;
+  --accent-foreground: #0C0C0E;
+  --destructive: #D62828;
+  --border: #E3E3E7;
+  --input: #E3E3E7;
+  --ring: #0C0C0E;
 
-  /* Семантика продукта: вердикт о посадке детали */
-  --fit-ok: #1E7F34;
-  --fit-rework: #A76A00;
-  --fit-no: #C0392B;
-  --fit-unknown: #5C646F;
-  --respect: #C86A00;
+  /* Семантика продукта: вердикт о посадке. Три состояния равноправны,
+     «не подтверждено» не маскируется под «подходит». Контраст выверен под белую карточку. */
+  --fit-ok: #1B7F3B;
+  --fit-rework: #A06A00;
+  --fit-no: #D62828;
+  --fit-unknown: #585862;
+  /* Респект — единственное живое пятно, как красный логотип в референсе */
+  --respect: #FF2929;
 
-  --radius: 0.5rem;
+  --radius: 0.875rem;
   --sidebar: #FFFFFF;
-  --sidebar-foreground: #16181C;
-  --sidebar-primary: #C86A00;
+  --sidebar-foreground: #0C0C0E;
+  --sidebar-primary: #0C0C0E;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #EDEFF2;
-  --sidebar-accent-foreground: #16181C;
-  --sidebar-border: #DCDFE4;
-  --sidebar-ring: #C86A00;
+  --sidebar-accent: #E9E9ED;
+  --sidebar-accent-foreground: #0C0C0E;
+  --sidebar-border: #E3E3E7;
+  --sidebar-ring: #0C0C0E;
 }
 
 .dark {
-  /* Тёмный гаражный — основная тема продукта.
-     Графит вместо чёрного: на OLED чёрный «проваливается», графит держит форму карточек.
-     Янтарь — единственный акцент, как лампа в боксе: им подсвечивается только действие. */
-  --background: #121417;
-  --foreground: #E9ECEF;
-  --card: #191C21;
-  --card-foreground: #E9ECEF;
-  --popover: #21252B;
-  --popover-foreground: #E9ECEF;
-  --primary: #FFA41B;
-  --primary-foreground: #1A1206;
-  --secondary: #21252B;
-  --secondary-foreground: #E9ECEF;
-  --muted: #1C2025;
-  --muted-foreground: #98A0AB;
-  --accent: #21252B;
-  --accent-foreground: #E9ECEF;
-  --destructive: #F05A4F;
-  --border: #2C3138;
-  --input: #2C3138;
-  --ring: #FFA41B;
+  /* Тёмный вариант той же системы — на случай, если понадобится. Продукт по умолчанию светлый. */
+  --background: #0C0C0E;
+  --foreground: #F0F0F2;
+  --card: #161619;
+  --card-foreground: #F0F0F2;
+  --popover: #161619;
+  --popover-foreground: #F0F0F2;
+  --primary: #F0F0F2;
+  --primary-foreground: #0C0C0E;
+  --secondary: #222228;
+  --secondary-foreground: #F0F0F2;
+  --muted: #1B1B1F;
+  --muted-foreground: #9A9AA6;
+  --accent: #222228;
+  --accent-foreground: #F0F0F2;
+  --destructive: #FF5A5A;
+  --border: #26262C;
+  --input: #26262C;
+  --ring: #F0F0F2;
 
-  /* Семантика продукта: вердикт о посадке детали.
-     Три состояния, и «не подтверждено» — полноправное, а не спрятанное. */
-  --fit-ok: #46B95F;
+  --fit-ok: #4CC46A;
   --fit-rework: #E0A400;
-  --fit-no: #F05A4F;
-  --fit-unknown: #8B949E;
-  --respect: #FFA41B;
+  --fit-no: #FF5A5A;
+  --fit-unknown: #9A9AA6;
+  --respect: #FF4444;
 
-  --sidebar: #191C21;
-  --sidebar-foreground: #E9ECEF;
-  --sidebar-primary: #FFA41B;
-  --sidebar-primary-foreground: #1A1206;
-  --sidebar-accent: #21252B;
-  --sidebar-accent-foreground: #E9ECEF;
-  --sidebar-border: #2C3138;
-  --sidebar-ring: #FFA41B;
+  --sidebar: #161619;
+  --sidebar-foreground: #F0F0F2;
+  --sidebar-primary: #F0F0F2;
+  --sidebar-primary-foreground: #0C0C0E;
+  --sidebar-accent: #222228;
+  --sidebar-accent-foreground: #F0F0F2;
+  --sidebar-border: #26262C;
+  --sidebar-ring: #F0F0F2;
 }
 
 @layer base {
