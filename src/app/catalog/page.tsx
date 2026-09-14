@@ -1,19 +1,30 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { categories, parts } from "@/lib/data";
 import { useApp } from "@/lib/state";
+import { api } from "@/lib/api";
 import { carLabel } from "@/lib/car";
 import { Screen, Stagger, StaggerItem } from "@/components/garage/screen";
 import { PartCard } from "@/components/garage/part-card";
+import { LoadingScreen } from "@/components/garage/load-state";
 import { buttonVariants } from "@/components/ui/button";
 
-// Экран 4: каталог. Порядок категорий — по частоте обсуждений из фазы 1:
-// диски и вылет впереди всего, впуск вырезан вовсе.
+// Экран 4: каталог. Счётчики приходят с сервера — это реальные установки
+// на такую же модификацию, а не константа в коде.
 export default function CatalogPage() {
-  const { state } = useApp();
+  const { state, loading } = useApp();
+  const [stats, setStats] = useState<Record<string, { installed: number; reworked: number }>>({});
 
-  if (!state.modification) {
+  useEffect(() => {
+    if (!state?.car.modification) return;
+    void api.stats().then((r) => setStats(r.stats));
+  }, [state?.car.modification]);
+
+  if (loading) return <LoadingScreen title="Что поставить" />;
+
+  if (!state?.car.modification) {
     return (
       <Screen title="Сначала выберите машину" subtitle="Без модификации нельзя показать, что встанет.">
         <Link href="/" className={buttonVariants({ className: "w-full" })}>
@@ -23,11 +34,13 @@ export default function CatalogPage() {
     );
   }
 
+  const mod = state.car.modification;
+
   return (
     <Screen
       title="Что поставить"
       subtitle="Категории — в порядке того, о чём чаще всего спрашивают."
-      car={carLabel(state.body, state.modification)}
+      car={carLabel(state.car.body, mod)}
     >
       <div className="flex flex-col gap-6">
         {categories.map((c) => {
@@ -47,7 +60,12 @@ export default function CatalogPage() {
                 <Stagger className="flex flex-col gap-2 pt-2">
                   {list.map((p) => (
                     <StaggerItem key={p.slug}>
-                      <PartCard part={p} fitment={p.fitment[state.modification!]} />
+                      <PartCard
+                        part={p}
+                        fitment={p.fitment[mod]}
+                        installed={stats[p.slug]?.installed ?? 0}
+                        reworked={stats[p.slug]?.reworked ?? 0}
+                      />
                     </StaggerItem>
                   ))}
                 </Stagger>

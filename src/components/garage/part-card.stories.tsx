@@ -17,27 +17,27 @@ type Story = StoryObj<typeof meta>;
 
 export const Fits: Story = {
   name: "Подходит — со счётом",
-  args: { part: wheels, fitment: "fits" },
+  args: { part: wheels, fitment: "fits", installed: 14, reworked: 0 },
 };
 
 export const Unknown: Story = {
   name: "Совместимость не подтверждена",
-  args: { part: adapters, fitment: "unknown" },
+  args: { part: adapters, fitment: "unknown", installed: 0, reworked: 0 },
 };
 
 export const DoesNotFit: Story = {
   name: "Не подходит — приглушена",
-  args: { part: spider, fitment: "no" },
+  args: { part: spider, fitment: "no", installed: 6, reworked: 2 },
 };
 
 export const InList: Story = {
   name: "В списке каталога",
-  args: { part: wheels, fitment: "fits" },
+  args: { part: wheels, fitment: "fits", installed: 14, reworked: 0 },
   render: () => (
     <div className="flex flex-col gap-2">
-      <PartCard part={wheels} fitment="fits" />
-      <PartCard part={adapters} fitment="unknown" />
-      <PartCard part={spider} fitment="no" />
+      <PartCard part={wheels} fitment="fits" installed={14} reworked={0} />
+      <PartCard part={adapters} fitment="unknown" installed={0} reworked={0} />
+      <PartCard part={spider} fitment="no" installed={6} reworked={2} />
     </div>
   ),
 };

@@ -1,29 +1,55 @@
 "use client";
 
 import Link from "next/link";
-import { parts } from "@/lib/data";
+import { useEffect, useState } from "react";
+import { parts, fitmentLabel, bodies, modifications } from "@/lib/data";
 import { useApp } from "@/lib/state";
+import { api, type FeedItem } from "@/lib/api";
 import { carLabel } from "@/lib/car";
 import { Screen, Stagger, StaggerItem } from "@/components/garage/screen";
 import { FitBadge } from "@/components/garage/fit-badge";
 import { InstallCounter } from "@/components/garage/install-counter";
 import { RespectButton } from "@/components/garage/respect-button";
 import { Money } from "@/components/garage/money";
+import { ListSkeleton } from "@/components/garage/skeletons";
+import { LoadingScreen } from "@/components/garage/load-state";
 import { buttonVariants } from "@/components/ui/button";
 
-// Экран 5: деталь на конкретной модификации. Сверху — счёт, а не звёзды.
+const carOf = (r: FeedItem) => {
+  const b = bodies.find((x) => x.code === r.body_code)?.name ?? "Гранта";
+  const m = modifications.find((x) => x.id === r.modification)?.name ?? "";
+  return `${b}${m ? `, ${m}` : ""}`;
+};
+
+// Экран 5: деталь на конкретной модификации. Счёт и отзывы приходят с сервера.
 export default function PartView({ slug }: { slug: string }) {
-  const { state, toggleRespect } = useApp();
+  const { state, loading, toggleRespect } = useApp();
+  const [data, setData] = useState<{ installed: number; reworked: number; reviews: FeedItem[] } | null>(null);
+
+  useEffect(() => {
+    if (!state) return;
+    void api.part(slug).then(setData);
+  }, [slug, state]);
+
   const part = parts.find((p) => p.slug === slug);
+  if (loading) return <LoadingScreen title="Деталь" />;
   if (!part) return <Screen title="Деталь не найдена">—</Screen>;
 
-  const fit = state.modification ? part.fitment[state.modification] : "unknown";
-  const inGarage = state.garage.some((g) => g.slug === part.slug);
+  const fit = state?.car.modification ? part.fitment[state.car.modification] : "unknown";
+  const inGarage = (state?.garage ?? []).some((g) => g.part_slug === part.slug);
 
   return (
-    <Screen title={part.name} subtitle={part.spec} car={carLabel(state.body, state.modification)}>
+    <Screen
+      title={part.name}
+      subtitle={part.spec}
+      car={carLabel(state?.car.body ?? null, state?.car.modification ?? null)}
+    >
       <div className="rounded-lg border border-border bg-card p-3">
-        <InstallCounter installed={part.installedCount} reworked={part.reworkedCount} />
+        {data ? (
+          <InstallCounter installed={data.installed} reworked={data.reworked} />
+        ) : (
+          <div className="h-9 animate-pulse rounded bg-muted" />
+        )}
         <div className="pt-3">
           <FitBadge fitment={fit} />
         </div>
@@ -77,43 +103,47 @@ export default function PartView({ slug }: { slug: string }) {
 
       <section className="pt-6">
         <h2 className="text-sm font-semibold">Кто ещё ставил это на машину как у вас</h2>
-        {part.reviews.length === 0 ? (
+
+        {data === null ? (
+          <div className="pt-2">
+            <ListSkeleton count={2} kind="feed" />
+          </div>
+        ) : data.reviews.length === 0 ? (
           <div className="mt-2 rounded-lg border border-dashed border-border p-3 text-sm text-muted-foreground">
-            Отзывов пока нет. Вот наша инструкция по установке с фото — чтобы страница была полезна
-            до того, как появится первый отзыв.
+            Отзывов пока нет. Поставьте первым — и расскажите, как встало: это увидят те, кто
+            выбирает то же самое.
           </div>
         ) : (
           <Stagger className="flex flex-col gap-2 pt-2">
-            {part.reviews.map((r) => {
-              const id = `${part.slug}:${r.author}`;
+            {data.reviews.map((r) => {
+              const target = `install:${r.id}`;
               return (
-                <StaggerItem key={r.author}>
+                <StaggerItem key={r.id}>
                   <article className="rounded-lg border border-border bg-card p-3 text-sm">
-                    <div className="font-semibold">{r.author}</div>
-                    <div className="text-xs text-muted-foreground">{r.modification}</div>
+                    <div className="font-semibold">{r.first_name ?? r.username ?? "Владелец"}</div>
+                    <div className="text-xs text-muted-foreground">{carOf(r)}</div>
                     <p className="pt-2">
-                      <span className={r.fitment === "clean" ? "text-fit-ok" : "text-fit-rework"}>
-                        {r.fitment === "clean" ? "Встало без доработок." : "Пришлось дорабатывать."}
+                      <span className={r.reworked ? "text-fit-rework" : "text-fit-ok"}>
+                        {r.reworked ? "Пришлось дорабатывать." : "Встало без доработок."}
                       </span>{" "}
-                      {r.extra}
+                      {r.review_text ?? "Отзыв ещё не написан."}
                     </p>
                     <p className="pt-1.5">
-                      <Money value={r.partPrice} />
-                      {r.workPrice > 0 ? (
+                      <Money value={r.price} />
+                      {r.work_price > 0 ? (
                         <>
                           {" + работа "}
-                          <Money value={r.workPrice} />
+                          <Money value={r.work_price} />
                         </>
                       ) : (
                         <span className="text-muted-foreground"> · ставил сам</span>
                       )}
                     </p>
-                    <p className="pt-1 text-xs text-muted-foreground">Через сезон: {r.longTerm}</p>
                     <div className="pt-3">
                       <RespectButton
                         count={r.respects}
-                        active={state.respects.includes(id)}
-                        onToggle={() => toggleRespect(id)}
+                        active={state?.respects.includes(target)}
+                        onToggle={() => toggleRespect(target)}
                       />
                     </div>
                   </article>
@@ -139,6 +169,10 @@ export default function PartView({ slug }: { slug: string }) {
           {inGarage ? "Уже в гараже — открыть" : "Поставил себе — добавить в гараж"}
         </Link>
       </div>
+
+      <p className="pt-3 text-xs text-muted-foreground">
+        {fitmentLabel[fit]}
+      </p>
     </Screen>
   );
 }

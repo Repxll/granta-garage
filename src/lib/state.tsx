@@ -1,79 +1,92 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { api, tg, type AppState } from "./api";
 
-// Состояние каркаса. В продукте машина и гараж живут на сервере и опознаются по Telegram-юзеру;
-// здесь — localStorage, чтобы happy path кликался целиком.
+// Состояние приходит с сервера одним запросом и обновляется после каждого действия.
+// localStorage больше не участвует: гараж должен быть виден с любого устройства
+// и попадать в чужие ленты.
 
-export type GarageItem = {
-  slug: string;
-  name: string;
-  price: number;
-  workPrice: number;
-  photo: boolean;
-  reworked: boolean | null;
-  addedAt: string;
+type Ctx = {
+  state: AppState | null;
+  loading: boolean;
+  error: string | null;
+  setCar: (body: string, modification: string) => Promise<void>;
+  addInstall: (i: { partSlug: string; price: number; workPrice: number; reworked: boolean }) => Promise<void>;
+  toggleRespect: (target: string) => Promise<void>;
+  reload: () => Promise<void>;
 };
 
-type State = {
-  body: string | null;
-  modification: string | null;
-  garage: GarageItem[];
-  respects: string[];
-};
-
-const empty: State = { body: null, modification: null, garage: [], respects: [] };
-
-const Ctx = createContext<{
-  state: State;
-  setCar: (body: string, modification: string) => void;
-  addItem: (item: GarageItem) => void;
-  toggleRespect: (id: string) => void;
-  reset: () => void;
-}>({ state: empty, setCar: () => {}, addItem: () => {}, toggleRespect: () => {}, reset: () => {} });
-
-const KEY = "granta-frame-v1";
+const AppCtx = createContext<Ctx>({
+  state: null,
+  loading: true,
+  error: null,
+  setCar: async () => {},
+  addInstall: async () => {},
+  toggleRespect: async () => {},
+  reload: async () => {},
+});
 
 export function StateProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<State>(empty);
+  const [state, setState] = useState<AppState | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const reload = useCallback(async () => {
     try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) setState({ ...empty, ...JSON.parse(raw) });
-    } catch {
-      // приватный режим или заблокированное хранилище — каркас просто стартует пустым
+      setState(await api.state());
+      setError(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Не получилось загрузить");
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  const persist = (next: State) => {
-    setState(next);
-    try {
-      localStorage.setItem(KEY, JSON.stringify(next));
-    } catch {
-      // см. выше
-    }
-  };
+  useEffect(() => {
+    tg()?.ready?.();
+    tg()?.expand?.();
+    void reload();
+  }, [reload]);
 
   return (
-    <Ctx.Provider
+    <AppCtx.Provider
       value={{
         state,
-        setCar: (body, modification) => persist({ ...state, body, modification }),
-        addItem: (item) => persist({ ...state, garage: [...state.garage, item] }),
-        toggleRespect: (id) =>
-          persist({
-            ...state,
-            respects: state.respects.includes(id)
-              ? state.respects.filter((r) => r !== id)
-              : [...state.respects, id],
-          }),
-        reset: () => persist(empty),
+        loading,
+        error,
+        reload,
+        setCar: async (body, modification) => {
+          await api.setCar(body, modification);
+          await reload();
+        },
+        addInstall: async (i) => {
+          await api.addInstall({ ...i, hasPhoto: true });
+          await reload();
+        },
+        toggleRespect: async (target) => {
+          // Оптимистично: счётчик отзывается сразу, расхождение чинится перезагрузкой.
+          setState((s) =>
+            s
+              ? {
+                  ...s,
+                  respects: s.respects.includes(target)
+                    ? s.respects.filter((t) => t !== target)
+                    : [...s.respects, target],
+                }
+              : s,
+          );
+          try {
+            await api.respect(target);
+          } catch {
+            await reload();
+          }
+        },
       }}
     >
       {children}
-    </Ctx.Provider>
+    </AppCtx.Provider>
   );
 }
 
-export const useApp = () => useContext(Ctx);
+export const useApp = () => useContext(AppCtx);

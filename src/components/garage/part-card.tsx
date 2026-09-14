@@ -7,7 +7,19 @@ import { money } from "@/lib/format";
 
 // Деталь в списке каталога. Показывает вердикт и счёт сразу — человек не должен
 // открывать карточку, чтобы понять, встанет ли.
-export function PartCard({ part, fitment, className }: { part: Part; fitment: Fitment; className?: string }) {
+export function PartCard({
+  part,
+  fitment,
+  installed,
+  reworked,
+  className,
+}: {
+  part: Part;
+  fitment: Fitment;
+  installed: number;
+  reworked: number;
+  className?: string;
+}) {
   return (
     <Link
       href={`/part/${part.slug}`}
@@ -26,7 +38,7 @@ export function PartCard({ part, fitment, className }: { part: Part; fitment: Fi
 
       <div className="pt-2">
         {fitment === "fits" ? (
-          <InstallCounter installed={part.installedCount} reworked={part.reworkedCount} compact />
+          <InstallCounter installed={installed} reworked={reworked} compact />
         ) : (
           <FitBadge fitment={fitment} size="sm" />
         )}

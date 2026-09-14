@@ -1,16 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Loader2 } from "lucide-react";
 import { bodies, modifications } from "@/lib/data";
 import { useApp } from "@/lib/state";
 import { Screen, Stagger, StaggerItem } from "@/components/garage/screen";
 
-// Экран 2, шаг 2: модификация строкой таблицы. Человек кликает строку,
-// а не собирает машину из четырёх дропдаунов.
+// Экран 2, шаг 2: модификация строкой таблицы. Выбор уходит на сервер —
+// машина привязана к Telegram-аккаунту, а не к браузеру.
 export default function ModificationPicker({ body }: { body: string }) {
   const { setCar } = useApp();
   const router = useRouter();
+  const [saving, setSaving] = useState<string | null>(null);
   const b = bodies.find((x) => x.code === body);
 
   return (
@@ -24,11 +26,17 @@ export default function ModificationPicker({ body }: { body: string }) {
           <StaggerItem key={m.id}>
             <button
               type="button"
-              onClick={() => {
-                setCar(body, m.id);
-                router.push("/feed");
+              disabled={saving !== null}
+              onClick={async () => {
+                setSaving(m.id);
+                try {
+                  await setCar(body, m.id);
+                  router.push("/feed");
+                } finally {
+                  setSaving(null);
+                }
               }}
-              className="flex w-full items-center gap-3 rounded-lg border border-border bg-card p-3 text-left transition-colors hover:border-primary/50"
+              className="flex w-full items-center gap-3 rounded-lg border border-border bg-card p-3 text-left transition-colors hover:border-primary/50 disabled:opacity-60"
             >
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-semibold">{m.name}</div>
@@ -37,7 +45,11 @@ export default function ModificationPicker({ body }: { body: string }) {
                 </div>
                 <div className="font-mono text-xs text-muted-foreground">{m.years}</div>
               </div>
-              <ChevronRight size={18} className="shrink-0 text-muted-foreground" />
+              {saving === m.id ? (
+                <Loader2 size={18} className="shrink-0 animate-spin text-primary" />
+              ) : (
+                <ChevronRight size={18} className="shrink-0 text-muted-foreground" />
+              )}
             </button>
           </StaggerItem>
         ))}

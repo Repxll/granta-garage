@@ -17,8 +17,10 @@ import { cn } from "@/lib/utils";
 // иначе гараж не отвечает на вопрос «сколько вложено» (болезнь Drive2).
 export default function AddForm({ slug }: { slug: string }) {
   const part = parts.find((p) => p.slug === slug);
-  const { state, addItem } = useApp();
+  const { state, addInstall } = useApp();
   const router = useRouter();
+  const [saving, setSaving] = useState(false);
+  const [failed, setFailed] = useState<string | null>(null);
   const [price, setPrice] = useState("");
   const [work, setWork] = useState("");
   const [fit, setFit] = useState<"clean" | "reworked" | null>(null);
@@ -29,7 +31,11 @@ export default function AddForm({ slug }: { slug: string }) {
   const complete = price !== "" && fit !== null && photo;
 
   return (
-    <Screen title="Что поставили" subtitle={part.name} car={carLabel(state.body, state.modification)}>
+    <Screen
+      title="Что поставили"
+      subtitle={part.name}
+      car={carLabel(state?.car.body ?? null, state?.car.modification ?? null)}
+    >
       <div className="flex flex-col gap-5">
         <div>
           <Label htmlFor="price">Сколько отдали за деталь</Label>
@@ -87,23 +93,29 @@ export default function AddForm({ slug }: { slug: string }) {
           Так каталог наполняется сам, а не превращается в ленту красивых фото.
         </p>
 
+        {failed && <p className="text-sm text-destructive">{failed}</p>}
+
         <Button
           className="w-full"
-          disabled={!complete}
-          onClick={() => {
-            addItem({
-              slug: part.slug,
-              name: part.name,
-              price: Number(price),
-              workPrice: Number(work || 0),
-              photo,
-              reworked: fit === "reworked",
-              addedAt: new Date().toISOString(),
-            });
-            router.push("/profile");
+          disabled={!complete || saving}
+          onClick={async () => {
+            setSaving(true);
+            setFailed(null);
+            try {
+              await addInstall({
+                partSlug: part.slug,
+                price: Number(price),
+                workPrice: Number(work || 0),
+                reworked: fit === "reworked",
+              });
+              router.push("/profile");
+            } catch (e) {
+              setFailed(e instanceof Error ? e.message : "Не получилось сохранить");
+              setSaving(false);
+            }
           }}
         >
-          {complete ? "Добавить в гараж" : "Заполните цену, фото и как встало"}
+          {saving ? "Сохраняем…" : complete ? "Добавить в гараж" : "Заполните цену, фото и как встало"}
         </Button>
       </div>
     </Screen>

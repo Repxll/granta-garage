@@ -75,9 +75,9 @@ export const CatalogWithData: Story = {
   name: "Каталог · три вердикта рядом",
   render: () => (
     <div className="flex flex-col gap-2">
-      <PartCard part={wheels} fitment="fits" />
-      <PartCard part={adapters} fitment="unknown" />
-      <PartCard part={spider} fitment="no" />
+      <PartCard part={wheels} fitment="fits" installed={14} reworked={0} />
+      <PartCard part={adapters} fitment="unknown" installed={0} reworked={0} />
+      <PartCard part={spider} fitment="no" installed={6} reworked={2} />
     </div>
   ),
 };
@@ -124,7 +124,7 @@ export const NarrowScreen: Story = {
   name: "Узкий экран 320px",
   render: () => (
     <div className="w-[320px] border border-dashed border-border p-2">
-      <PartCard part={wheels} fitment="fits" />
+      <PartCard part={wheels} fitment="fits" installed={14} reworked={0} />
       <div className="pt-2">
         <FeedCard
           author="Владелец с длинным именем профиля"
